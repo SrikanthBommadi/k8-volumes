@@ -87,22 +87,22 @@ spec:
         project: project
     spec:
       containers:
+        - name: frontend-container
+          image: joindevops/frontend:1.2.0
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: nginx-volume
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
       volumes:
-      - name: nginx
-        ConfigMap:
-          name: nginx
-          items:
-            - key: nginx.conf
-              path: nginx.conf
-      - name: nginx
-        image: joindevops/frontend:1.2.0
-        ports:
-        - containerPort: 8080
-        volumeMounts:
-        - name: nginx
-          mountPath: /etc/nginx/nginx.conf
-          subPath: nginx.conf
-          readOnly: true
+        - name: nginx-volume
+          configMap:
+            name: nginx
+            items:
+              - key: nginx.conf
+                path: nginx.conf
 ---
 kind: Service
 apiVersion: v1
