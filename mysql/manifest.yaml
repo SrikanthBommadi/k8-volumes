@@ -1,4 +1,83 @@
-apiVersion: v1 ##headless service ,normal service,statefull set
+# apiVersion: v1 ##headless service ,normal service,statefull set
+# kind: Service
+# metadata:
+#   name: mysql-headless
+#   namespace: project
+#   labels:
+#     app: mysql
+#     project: project
+#     tier: db
+# spec:
+#   selector:
+#     app: mysql
+#     project: project
+#     tier: db
+#   Ports: 
+#   - protocol: TCP
+#     port: 3306
+#     targetPort: 3306
+# ---
+# kind: Service
+# apiVersion: v1
+# metadata:
+#   name: mysql
+#   namespace: project
+#   labels:
+#     app: mysql
+#     project: project
+#     tier: db
+# spec:
+#   selector: # labels will used here for selecting the pod
+#     app: mysql
+#     project: project
+#     tier: db
+#   ports:
+#   - protocol: TCP
+#     port: 3306
+#     targetPort: 3306
+# ---
+# apiVersion: apps/v1
+# kind: StatefulSet
+# metadata:
+#   name: mysql
+#   namespace: project  
+# spec:
+#   selector:
+#     matchLabels:
+#       app: mysql
+#       project: project
+#       tier: db      
+#   serviceName: "mysql-headless"
+#   replicas: 2 # by default is 1
+#   minReadySeconds: 10 # by default is 0
+#   template:
+#     metadata:
+#       labels:
+#         app: mysql # has to match .spec.selector.matchLabels
+#         project: project
+#         tier: db
+#     spec:
+#       terminationGracePeriodSeconds: 10
+#       containers:
+#       - name: mysql
+#         image: joindevops/mysql:1.0.0
+#         volumeMounts:
+#         - name: mysql
+#           mountPath: /var/lib/mysql
+# ######IF WANT PVC DIRECTLY PROVIDE IN STATEFULLSET
+#   volumeClaimTemplates:
+#   - metadata:
+#       name: mysql
+#       namespace: project
+#     spec:
+#       accessModes: [ "ReadWriteOnce" ]
+#       storageClassName: "ebs-sc"
+#       resources:
+#         requests:
+#           storage: 1Gi
+# ---
+# Headless Service for StatefulSet
+apiVersion: v1
 kind: Service
 metadata:
   name: mysql-headless
@@ -8,17 +87,19 @@ metadata:
     project: project
     tier: db
 spec:
+  clusterIP: None  # Important for headless service, no IP will be assigned to the service
   selector:
     app: mysql
     project: project
     tier: db
-  Ports: 
-  - protocol: TCP
-    port: 3306
-    targetPort: 3306
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
 ---
-kind: Service
+# Normal Service
 apiVersion: v1
+kind: Service
 metadata:
   name: mysql
   namespace: project
@@ -27,15 +108,16 @@ metadata:
     project: project
     tier: db
 spec:
-  selector: # labels will used here for selecting the pod
+  selector: # labels will be used here for selecting the pod
     app: mysql
     project: project
     tier: db
   ports:
-  - protocol: TCP
-    port: 3306
-    targetPort: 3306
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
 ---
+# StatefulSet for MySQL
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -47,13 +129,13 @@ spec:
       app: mysql
       project: project
       tier: db      
-  serviceName: "mysql-headless"
-  replicas: 2 # by default is 1
-  minReadySeconds: 10 # by default is 0
+  serviceName: "mysql-headless" # This should reference the headless service
+  replicas: 2 # Number of MySQL replicas
+  minReadySeconds: 10 # Time to wait before considering the pod ready
   template:
     metadata:
       labels:
-        app: mysql # has to match .spec.selector.matchLabels
+        app: mysql # Must match .spec.selector.matchLabels
         project: project
         tier: db
     spec:
@@ -64,14 +146,13 @@ spec:
         volumeMounts:
         - name: mysql
           mountPath: /var/lib/mysql
-######IF WANT PVC DIRECTLY PROVIDE IN STATEFULLSET
   volumeClaimTemplates:
   - metadata:
       name: mysql
       namespace: project
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: "ebs-sc"
+      storageClassName: "ebs-sc" # Ensure this StorageClass exists in your cluster
       resources:
         requests:
           storage: 1Gi
