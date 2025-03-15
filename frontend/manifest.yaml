@@ -131,6 +131,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: frontend
+  namespace: project
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
