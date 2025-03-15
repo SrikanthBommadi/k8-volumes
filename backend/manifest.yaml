@@ -27,7 +27,7 @@ spec:
       labels:
         app: backend
         tier: backend
-        project: projects
+        project: project
     spec:
       containers:
       - name: nginx
