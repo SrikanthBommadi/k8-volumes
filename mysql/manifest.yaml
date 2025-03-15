@@ -52,7 +52,7 @@ spec:
       project: project
       tier: db      
   serviceName: "mysql-headless" # This should reference the headless service
-  replicas: 2 # Number of MySQL replicas
+  replicas: 1 # Number of MySQL replicas
   minReadySeconds: 10 # Time to wait before considering the pod ready
   template:
     metadata:
