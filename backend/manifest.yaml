@@ -33,7 +33,7 @@ spec:
       - name: nginx
         image: joindevops/backend:1.0.0  ### srikanth9959/deployment:1.0.0
         envForm:
-        - ConfigMapRef:
+        - configMapRef:
             name: backend
 ---
 kind: Service
