@@ -23,18 +23,18 @@ spec:
       tier: backend
       project: project
   template:
-  metadata:
-    labels:
-      app: backend
-      tier: backend
-      project: project
-  spec:
-    containers:
-    - name: nginx
-      image: joindevops/backend:1.0.0  ### srikanth9959/deployment:1.0.0
-      envForm:
-      - ConfigMapRef:
-          name: backend
+    metadata:
+      labels:
+        app: backend
+        tier: backend
+        project: projects
+    spec:
+      containers:
+      - name: nginx
+        image: joindevops/backend:1.0.0  ### srikanth9959/deployment:1.0.0
+        envForm:
+        - ConfigMapRef:
+            name: backend
 ---
 kind: Service
 apiVersion: v1
